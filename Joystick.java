@@ -2,7 +2,7 @@
  * @author Axel Slättman
  *06/04/2016
 
- * Version 0.0.0.1
+ * Version 1.0.0
 
  */
 
@@ -14,6 +14,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -68,6 +69,7 @@ public class Joystick extends Activity implements View.OnTouchListener {
         SurfaceHolder holder;
         boolean check = false;
         float radius;
+        String xText, yText, angleText, hypo, speed;
 
 
 
@@ -84,9 +86,10 @@ public class Joystick extends Activity implements View.OnTouchListener {
                 if(!holder.getSurface().isValid())
                     continue;
 
-                /*red.setColor(Color.RED);
+                red.setColor(Color.RED);
                 red.setStyle(Paint.Style.STROKE);
-                red.setStrokeWidth(3);*/
+                red.setStrokeWidth(3);
+                red.setTextSize(30);
 
                 c = holder.lockCanvas();
                 c.drawARGB(255, 255, 255, 255);
@@ -99,7 +102,16 @@ public class Joystick extends Activity implements View.OnTouchListener {
                     calc(x, y);
                     c.drawBitmap(joy, x - (joy.getWidth()/2), y - (joy.getHeight()/2), null);
                 }
-
+                xText = "X = " + (int)dx;
+                yText = "Y = " + (int)dy;
+                angleText = "angle = " + (int)(angle*180/Math.PI);
+                hypo = "Hypo = " + (int)h;
+                speed = "Speed = " + (int)((h-1)*0.6666666667);
+                c.drawText(xText,100,100,red);
+                c.drawText(yText,100,150,red);
+                c.drawText(angleText,100,200,red);
+                c.drawText(hypo,100,250,red);
+                c.drawText(speed,100,300,red);
 
                 holder.unlockCanvasAndPost(c);
             }
@@ -132,6 +144,7 @@ public class Joystick extends Activity implements View.OnTouchListener {
 
             angle = (float)Math.atan(Math.abs(dy/dx));
             h = (float)Math.sqrt(dx*dx+dy*dy);
+            if(h>151) h = 151;
             if(h > radius){
                 if(dx > 0 && dy > 0) {
                     xx = (float) (zeroX + (radius * Math.cos(angle)));
@@ -172,7 +185,7 @@ public class Joystick extends Activity implements View.OnTouchListener {
                 y = me.getY();
                 break;
             case MotionEvent.ACTION_UP:
-                x = y = 0;
+                x = y = dx = dy = h = angle = 0;
                 break;
             case MotionEvent.ACTION_MOVE:
                 x = me.getX();
