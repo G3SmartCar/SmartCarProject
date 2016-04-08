@@ -103,6 +103,7 @@ public class Joystick extends Activity implements View.OnTouchListener {
                     calc(x, y);
                     c.drawBitmap(joy, x - (joy.getWidth()/2), y - (joy.getHeight()/2), null);
                 }
+				//Testing data
                 xText = "X = " + (int)dx;
                 yText = "Y = " + (int)dy;
                 angleText = "angle = " + (int)(angle*180/Math.PI);
