@@ -2,7 +2,7 @@
  * @author Axel Slättman
  *06/04/2016
 
- * Version 0.0.0.2
+ * Version 0.0.0.3
 
  */
 
@@ -29,7 +29,7 @@ public class Joystick extends Activity implements View.OnTouchListener {
     MyView v;
     Bitmap joy;
     Bitmap joybg;
-    int zeroX, zeroY;
+    int zeroX, zeroY, car;
     float x, y, dx, dy, h, angle;
     Canvas c = new Canvas();
     Paint red = new Paint();
@@ -69,7 +69,8 @@ public class Joystick extends Activity implements View.OnTouchListener {
         SurfaceHolder holder;
         boolean check = false;
         float radius;
-        String xText, yText, angleText, hypo, speed;
+        int quadrant;
+        String xText, yText, angleText, hypo, speed, carText;
 
 
 
@@ -107,11 +108,13 @@ public class Joystick extends Activity implements View.OnTouchListener {
                 angleText = "angle = " + (int)(angle*180/Math.PI);
                 hypo = "Hypo = " + (int)h;
                 speed = "Speed = " + (int)((h-1)*0.6666666667);
+                carText = "Angle for car = " + car;
                 c.drawText(xText,100,100,red);
                 c.drawText(yText,100,150,red);
                 c.drawText(angleText,100,200,red);
                 c.drawText(hypo,100,250,red);
                 c.drawText(speed,100,300,red);
+                c.drawText(carText,100,350,red);
 
                 holder.unlockCanvasAndPost(c);
             }
@@ -145,31 +148,66 @@ public class Joystick extends Activity implements View.OnTouchListener {
             angle = (float)Math.atan(Math.abs(dy/dx));
             h = (float)Math.sqrt(dx*dx+dy*dy);
             if(h>151) h = 151;
-            if(h > radius){
-                if(dx > 0 && dy > 0) {
+
+            if(dx > 0 && dy > 0) {
+                if(h > radius) {
                     xx = (float) (zeroX + (radius * Math.cos(angle)));
                     yy = (float) (zeroY + (radius * Math.sin(angle)));
                 }
-                else if(dx>0&&dy<0){
-                    xx = (float) (zeroX + (radius * Math.cos(angle)));
-                    yy = (float) (zeroY - (radius * Math.sin(angle)));
-                }
-                else if(dx<0&&dy<0){
-                    xx = (float) (zeroX - (radius * Math.cos(angle)));
-                    yy = (float) (zeroY - (radius * Math.sin(angle)));
-                }
-                else if(dx < 0 && dy > 0){
-                    xx = (float) (zeroX - (radius * Math.cos(angle)));
-                    yy = (float) (zeroY + (radius * Math.sin(angle)));
-                }
+                quadrant = 1;
             }
+            else if(dx>0&&dy<0){
+                if(h > radius) {
+                    xx = (float) (zeroX + (radius * Math.cos(angle)));
+                    yy = (float) (zeroY - (radius * Math.sin(angle)));
+                }
+                quadrant = 0;
+            }
+            else if(dx<0&&dy<0){
+                if(h > radius) {
+                    xx = (float) (zeroX - (radius * Math.cos(angle)));
+                    yy = (float) (zeroY - (radius * Math.sin(angle)));
+                }
+                quadrant = 3;
+            }
+            else if(dx < 0 && dy > 0){
+                if(h > radius) {
+                    xx = (float) (zeroX - (radius * Math.cos(angle)));
+                    yy = (float) (zeroY + (radius * Math.sin(angle)));
+                }
+                quadrant = 2;
+            }
+
             else{
                 xx = zeroX + dx;
                 yy = zeroY + dy;
             }
             x = xx;
             y = yy;
+
+            car = determineCarAngle(quadrant);
         }
+
+        public int determineCarAngle(int q){
+            int a = 0;
+
+            switch (q){
+                case 0: a = (int)Math.abs((angle*180/Math.PI)-90);
+                    break;
+
+                case 1: a = (int)(angle*180/Math.PI) + 90;
+                    break;
+
+                case 2: a = (int)Math.abs((angle*180/Math.PI)-270);
+                    break;
+
+                case 3: a = (int)(angle*180/Math.PI) +270;
+                    break;
+            }
+
+            return a;
+        }
+
 
 
 
@@ -186,6 +224,7 @@ public class Joystick extends Activity implements View.OnTouchListener {
                 break;
             case MotionEvent.ACTION_UP:
                 x = y = dx = dy = h = angle = 0;
+                car = 0;
                 break;
             case MotionEvent.ACTION_MOVE:
                 x = me.getX();
