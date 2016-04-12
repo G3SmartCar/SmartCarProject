@@ -1,13 +1,12 @@
+package com.gu.example.axel.joystick;
+
 /**
  * @author Axel Slättman
  *06/04/2016
 
- * Version 0.0.0.3
+ * Version 0.0.0.4
 
  */
-
-
-package com.gu.example.axel.joymeby;
 
 import android.app.Activity;
 import android.content.Context;
@@ -29,7 +28,7 @@ public class Joystick extends Activity implements View.OnTouchListener {
     MyView v;
     Bitmap joy;
     Bitmap joybg;
-    int zeroX, zeroY, car;
+    int zeroX, zeroY, car, speed;
     float x, y, dx, dy, h, angle;
     Canvas c = new Canvas();
     Paint red = new Paint();
@@ -70,7 +69,7 @@ public class Joystick extends Activity implements View.OnTouchListener {
         boolean check = false;
         float radius;
         int quadrant;
-        String xText, yText, angleText, hypo, speed, carText;
+        String xText, yText, angleText, hypo, speedText, carText;
 
 
 
@@ -103,18 +102,17 @@ public class Joystick extends Activity implements View.OnTouchListener {
                     calc(x, y);
                     c.drawBitmap(joy, x - (joy.getWidth()/2), y - (joy.getHeight()/2), null);
                 }
-				//Testing data
                 xText = "X = " + (int)dx;
                 yText = "Y = " + (int)dy;
                 angleText = "angle = " + (int)(angle*180/Math.PI);
                 hypo = "Hypo = " + (int)h;
-                speed = "Speed = " + (int)((h-1)*0.6666666667);
+                speedText = "Speed = " + speed;
                 carText = "Angle for car = " + car;
                 c.drawText(xText,100,100,red);
                 c.drawText(yText,100,150,red);
                 c.drawText(angleText,100,200,red);
                 c.drawText(hypo,100,250,red);
-                c.drawText(speed,100,300,red);
+                c.drawText(speedText,100,300,red);
                 c.drawText(carText,100,350,red);
 
                 holder.unlockCanvasAndPost(c);
@@ -122,7 +120,7 @@ public class Joystick extends Activity implements View.OnTouchListener {
         }
         public void pause(){
             check = false;
-            while(true){
+            while(check){
                 try{
                     thread.join();
                 }catch (InterruptedException e){
@@ -149,13 +147,15 @@ public class Joystick extends Activity implements View.OnTouchListener {
             angle = (float)Math.atan(Math.abs(dy/dx));
             h = (float)Math.sqrt(dx*dx+dy*dy);
             if(h>151) h = 151;
+            speed = (int)((h-1)*0.6666666667);
 
             if(dx > 0 && dy > 0) {
-                if(h > radius) {
+                if(h > radius) {  //Keep the joystick within limits
                     xx = (float) (zeroX + (radius * Math.cos(angle)));
                     yy = (float) (zeroY + (radius * Math.sin(angle)));
                 }
-                quadrant = 1;
+                speed = -speed; //Reverse speed when pulling down on joystick
+                quadrant = 1; //Assign quadrant so we can transform the angle into correct one on 0-360 scale
             }
             else if(dx>0&&dy<0){
                 if(h > radius) {
@@ -176,6 +176,7 @@ public class Joystick extends Activity implements View.OnTouchListener {
                     xx = (float) (zeroX - (radius * Math.cos(angle)));
                     yy = (float) (zeroY + (radius * Math.sin(angle)));
                 }
+                speed = -speed;
                 quadrant = 2;
             }
 
@@ -189,6 +190,7 @@ public class Joystick extends Activity implements View.OnTouchListener {
             car = determineCarAngle(quadrant);
         }
 
+        //Function to convert angle from 0-90 scale into 0-360 based on which quadrant the joystick is in
         public int determineCarAngle(int q){
             int a = 0;
 
@@ -220,14 +222,17 @@ public class Joystick extends Activity implements View.OnTouchListener {
 
         switch(me.getAction()){
             case MotionEvent.ACTION_DOWN:
+                //Get x and y
                 x = me.getX();
                 y = me.getY();
                 break;
             case MotionEvent.ACTION_UP:
+                //Reset every value on release of joystick
                 x = y = dx = dy = h = angle = 0;
-                car = 0;
+                car = speed = 0;
                 break;
             case MotionEvent.ACTION_MOVE:
+                //Update x and y
                 x = me.getX();
                 y = me.getY();
 
@@ -239,3 +244,4 @@ public class Joystick extends Activity implements View.OnTouchListener {
 
 
 }
+
