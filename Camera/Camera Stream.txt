@@ -1,0 +1,13 @@
+I've installed mjpg-streamer on the RP. run these commands in the order:
+
+1- mkdir /tmp/stream
+
+2- raspistill --nopreview -w 640 -h 480 -q 5 -o /tmp/stream/pic.jpg -tl 100 -t 9999999 -th 0:0:0 &
+
+3- LD_LIBRARY_PATH=/usr/local/lib mjpg_streamer -i "input_file.so -f /tmp/stream -n pic.jpg" -o "output_http.so -w /usr/local/www"
+
+
+
+Now camera is streaming. Open browser to see the feed. Type your ip in YOUR-IP
+
+YOUR-IP:8080/?action=stream.html

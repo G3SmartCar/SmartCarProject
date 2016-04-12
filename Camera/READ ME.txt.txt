@@ -1,0 +1,6 @@
+To start camera streaming read Camera Stream.txt.
+
+
+CameraStream is a page with a button given the video link to it; when pressed, opens the link in browser. 
+
+LiveStream is a page playing videos, doesn't read the http link we have.
