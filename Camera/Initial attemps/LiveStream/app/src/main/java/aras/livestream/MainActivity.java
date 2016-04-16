@@ -1,5 +1,11 @@
 package aras.livestream;
-
+/**
+  *
+  * @author Aras Bazyan
+  * 12/04/2016
+  *
+  * Attempt 2 to get live stream.
+  */
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.support.v7.app.ActionBarActivity;
