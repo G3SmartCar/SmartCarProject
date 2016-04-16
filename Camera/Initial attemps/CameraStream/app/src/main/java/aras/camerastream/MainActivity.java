@@ -1,5 +1,11 @@
 package aras.camerastream;
-
+/**
+  *
+  * @author Aras Bazyan
+  * 8/04/2016
+  *
+  * Initial Attempt to get live stream
+  */
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
