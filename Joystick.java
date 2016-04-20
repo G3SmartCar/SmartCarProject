@@ -69,6 +69,22 @@ public class Joystick extends BluetoothActivity implements View.OnTouchListener 
             handleThread();
     }
 
+    public static Bitmap getCameraImage(String str){
+        try{
+            URL url = new URL(str);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setDoInput(true);
+            con.connect();
+            InputStream input = con.getInputStream();
+            Bitmap bit = BitmapFactory.decodeStream(input);
+            return bit;
+        }
+        catch (IOException e){
+            System.out.println(e);
+            return null;
+        }
+    }
+
     /* public void run(){
          try{
              bluetoothThread.sendData("m" + speed);
@@ -148,6 +164,7 @@ public class Joystick extends BluetoothActivity implements View.OnTouchListener 
         float radius;
         int quadrant;
         String xText, yText, angleText, hypo, speedText, carText;
+        Bitmap cameraFeed;
 
 
         public MyView(Context context) {
@@ -167,8 +184,13 @@ public class Joystick extends BluetoothActivity implements View.OnTouchListener 
                 red.setStrokeWidth(3);
                 red.setTextSize(30);
 
+                cameraFeed = getCameraImage("url");
+
                 c = holder.lockCanvas();
                 c.drawARGB(255, 255, 255, 255);
+
+                c.drawBitmap(cameraFeed);
+
                 c.drawBitmap(joybg, c.getWidth() / 2 - joybg.getWidth() / 2, c.getHeight() / 2 - joybg.getHeight() / 2, null);
                 radius = joybg.getWidth() / 2;
                 if (x == 0 && y == 0) {
