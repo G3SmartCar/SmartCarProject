@@ -8,7 +8,7 @@ package com.example.thomasemilsson.smartcarapplication;
  * Bluetooth by Thomas Emilsson
  * 09/05/2016
  *
- * Version 0.0.0.7
+ * Version 0.0.0.8
  */
 
 
@@ -51,7 +51,7 @@ public class Joystick extends BluetoothActivity implements View.OnTouchListener 
     int zeroX, zeroY, car, speed;
     float x, y, dx, dy, h, angle;
 
-    boolean go = false;
+    boolean joySwitch = true;
 
     Canvas c = new Canvas();
     Paint red = new Paint();
@@ -82,6 +82,8 @@ public class Joystick extends BluetoothActivity implements View.OnTouchListener 
 
                 // view.loadUrl("javascript:document.getElementsByClassName('container-fluid text-center').style.display = 'none'");
                 view.loadUrl("javascript:document.getElementById(\"mjpeg_dest\").click();");
+                view.loadUrl("javascript:document.getElementById(\"mjpeg_dest\").removeAttribute(\"onclick\");");
+
 
               /*  view.loadUrl("javascript:document.getElementById('toggle_display').style.display = 'none'");
                 view.loadUrl("javascript:document.getElementById('main-buttons').style.display = 'none'");
@@ -184,6 +186,7 @@ public class Joystick extends BluetoothActivity implements View.OnTouchListener 
             super(context);
             holder = getHolder();
             setZOrderOnTop(true);
+
         }
 
         //Thread that repaints the canvas
@@ -204,28 +207,33 @@ public class Joystick extends BluetoothActivity implements View.OnTouchListener 
                 holder.setFormat(PixelFormat.TRANSPARENT);
 
                 c.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+
+                //if(joySwitch) {
                 c.drawBitmap(joybg, c.getWidth() / 2 - joybg.getWidth() / 2, c.getHeight() / 2 - joybg.getHeight() / 2, null);
-                radius = joybg.getWidth()/2;
-                if(x == 0 && y == 0)
-                    c.drawBitmap(joy, c.getWidth() / 2 - joy.getWidth() / 2, c.getHeight() / 2 - joy.getHeight() / 2, null);
+                radius = joybg.getWidth() / 2;
 
-                else {
-                    calc(x, y);
-                    c.drawBitmap(joy, x - (joy.getWidth()/2), y - (joy.getHeight()/2), alpha);
-                }
-               /* xText = "X = " + (int)dx;
-                yText = "Y = " + (int)dy;
-                angleText = "angle = " + (int)(angle*180/Math.PI);
-                hypo = "Hypo = " + (int)h;
-                speedText = "Speed = " + speed;
-                carText = "Angle for car = " + car;
-                c.drawText(xText,100,100,red);
-                c.drawText(yText,100,150,red);
-                c.drawText(angleText,100,200,red);
-                c.drawText(hypo,100,250,red);
-                c.drawText(speedText,100,300,red);
-                c.drawText(carText,100,350,red);*/
+                    if (x == 0 && y == 0)
+                        c.drawBitmap(joy, c.getWidth() / 2 - joy.getWidth() / 2, c.getHeight() / 2 - joy.getHeight() / 2, null);
 
+
+                    else {
+                        calc(x, y);
+                        c.drawBitmap(joy, x - (joy.getWidth() / 2), y - (joy.getHeight() / 2), null);
+                    }
+                   /* xText = "X = " + (int)dx;
+                    yText = "Y = " + (int)dy;
+                    angleText = "angle = " + (int)(angle*180/Math.PI);
+                    hypo = "Hypo = " + (int)h;
+                    speedText = "Speed = " + speed;
+                    carText = "Angle for car = " + car;
+                    c.drawText(xText,100,100,red);
+                    c.drawText(yText,100,150,red);
+                    c.drawText(angleText,100,200,red);
+                    c.drawText(hypo,100,250,red);
+                    c.drawText(speedText,100,300,red);
+                    c.drawText(carText,100,350,red);*/
+
+                //c.drawText("" + joy.getHeight() + "\n" + joy.getWidth(),0,0,red);
                 holder.unlockCanvasAndPost(c);
             }
         }
@@ -347,6 +355,8 @@ public class Joystick extends BluetoothActivity implements View.OnTouchListener 
     @Override
     public boolean onTouch(View v, MotionEvent me) {
 
+
+
         switch (me.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 //Get x and y
@@ -366,6 +376,7 @@ public class Joystick extends BluetoothActivity implements View.OnTouchListener 
                 y = me.getY();
 
         }
+
 
 
         return true;
