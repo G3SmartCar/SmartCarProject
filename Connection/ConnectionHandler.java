@@ -72,6 +72,9 @@ public class ConnectionHandler{
         // Disconnect, Set wifi to false
         Properties.getInstance().wifiStatus = false;
         ConnectionBoolean.getInstance().activeConnection = false;
+        
+        connectionThread.disconnect();
+        connectionThread.stop();
 
         Intent intent = new Intent(from, ConnectionActivity.class);
         intent.putExtra(ConnectionActivity.EXTRA_ADDRESS, "==");
