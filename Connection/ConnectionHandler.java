@@ -56,7 +56,8 @@ public class ConnectionHandler{
         Log.v(TAG, "DISCONNECT button pressed");
 
         // STOP CAR IF DISCONNECTED
-        connectionThread.sendData("s");
+        connectionThread.sendData("m0 + "\n"");
+        connectionThread.sendData("t0 + "\n"");
 
         if (connectionThread != null) {
             connectionThread.interrupt();
