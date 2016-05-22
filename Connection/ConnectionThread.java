@@ -100,7 +100,7 @@ public class ConnectionThread extends Thread {
 
     }
 
-    private void disconnect() {
+    public void disconnect() {
         Log.d("Disconnecting", "...");
 
 
