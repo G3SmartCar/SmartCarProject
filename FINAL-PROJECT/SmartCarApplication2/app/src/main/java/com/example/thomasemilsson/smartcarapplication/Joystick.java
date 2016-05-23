@@ -3,14 +3,18 @@ package com.example.thomasemilsson.smartcarapplication;
 /**
  * Created by Axel on 14-Apr-16.
  *
- * @author         Axel Slättman
- * Camera       by Aras Bazyan
- * Bluetooth    by Thomas Emilsson
+ * @author              Axel Slättman
+ * Camera               by Aras Bazyan
+ * Bluetooth            by Thomas Emilsson
  * 09/05/2016
  *
- * Wifi         by Thomas Emilsson
- * Integration  Thomas/Axel
+ * Wifi                 by Thomas Emilsson
+ * Integration          Thomas/Axel
  * 20/05/2016
+ *
+ * Tilt                 by Thomas Emilsson & Daniel
+ *
+ * Final Integration    by Thomas/Axel
  * Version 1.3.2.1
  */
 
