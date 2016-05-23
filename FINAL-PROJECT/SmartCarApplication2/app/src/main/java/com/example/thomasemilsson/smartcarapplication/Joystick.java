@@ -28,9 +28,11 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -39,15 +41,20 @@ import android.view.View;
 import android.view.WindowManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
 
-public class Joystick extends SlideMenu implements View.OnTouchListener, SensorEventListener {
+public class Joystick extends ConnectionActivity implements View.OnTouchListener, SensorEventListener {
 
     MyView v;
     Bitmap joy;
@@ -57,20 +64,17 @@ public class Joystick extends SlideMenu implements View.OnTouchListener, SensorE
     private static final String TAG = "Joystick";
 
     int zeroX, zeroY, car, speed;
-    static long sendTime, lastTime;
+    static long lastTime;
     float x, y, dx, dy, h, angle;
 
-    boolean joySwitch = true;
-    boolean connected = false;
+    boolean joySwitch;
+    //boolean connected = false;
 
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
 
     Canvas c = new Canvas();
     Paint alpha = new Paint();
-
-
-
 
 
     ConnectionThread connectionThread;
@@ -81,15 +85,19 @@ public class Joystick extends SlideMenu implements View.OnTouchListener, SensorE
 
 
     private String address, status, addressText;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.joystick);
 
-
+        joySwitch = true;
         lastTime = System.currentTimeMillis();
-
 
 
         // GET ADDRESS
@@ -104,8 +112,7 @@ public class Joystick extends SlideMenu implements View.OnTouchListener, SensorE
         }
 
 
-
-        String feedSource = "http://"+ IP.getInstance().activeIP + "/html/";
+        String feedSource = "http://" + IP.getInstance().activeIP + "/html/";
         WebView view = (WebView) this.findViewById(R.id.webView);
         view.getSettings().setJavaScriptEnabled(true);
         view.setWebViewClient(new WebViewClient() {
@@ -133,75 +140,55 @@ public class Joystick extends SlideMenu implements View.OnTouchListener, SensorE
         RelativeLayout surface = (RelativeLayout) findViewById(R.id.joystick);
         surface.addView(v);
 
-            ConnectionSingleton.getInstance().connectionHandler.handleThread(address);
+        ConnectionSingleton.getInstance().connectionHandler.handleThread(address);
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
-    public void switchControl(View view)
-    {
-        /*ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("close\n");
-        ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("random\n");
+    public void switchControl(View view) {
 
-        try {
-            ConnectionSingleton.getInstance().connectionHandler.connectionThread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        ConnectionSingleton.getInstance().connectionHandler = null;
-        Intent intent = new Intent(Joystick.this, Tilt.class);
-        startActivity(intent);*/
-
-        if(joySwitch) {
+        if (joySwitch) {
+            v.stopPaint();
             v.pause();
             joySwitch = false;
-        }
-        else{
+            ImageButton btn = (ImageButton) findViewById(R.id.toTilt);
+            btn.setBackgroundResource(R.drawable.joystick);
+        } else {
             ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("m" + 0 + "\n");
             ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("t" + 0 + "\n");
             v.resume();
+            v.stopPaint();
             joySwitch = true;
+            ImageButton btn = (ImageButton) findViewById(R.id.toTilt);
+            btn.setBackgroundResource(R.drawable.tilt2);
         }
 
     }
 
 
-   /* private void handleThread() {
-        connectionThread = new ConnectionThread(address, new Handler() {
+    @Override
+    public void onBackPressed(){
 
-            @Override
-            public void handleMessage(Message message) {
-                String s = (String) message.obj;
+        super.onBackPressed();
 
-                // Interpret Message
-                if (s.equals("CONNECTED")) {
-                    status = "CONNECTED! :)";
-                    addressText = address;
-                    connected = true;
-                } else if (s.equals("CONNECTION FAILED")) {
-                    status = "Connection Failed";
-                    addressText = address;
-                    connected = false;
-                } else {
-                    status = "help";
-                    connected = false;
-                }
-            }
-        });
+        if(Properties.getInstance().wifiStatus) {
+            ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("close\n");
+            ConnectionBoolean.getInstance().activeConnection = false;
+        }
 
-        connectionThread.start();
-    }*/
-
+        ConnectionSingleton.getInstance().connectionHandler.connected = false;
+        Properties.getInstance().wifiStatus = false;
+    }
 
     @Override
     protected void onPause() {
         super.onPause();
 
-        if(ConnectionSingleton.getInstance().connectionHandler.connectionThread != null){
+        if (ConnectionSingleton.getInstance().connectionHandler.connectionThread != null) {
             ConnectionSingleton.getInstance().connectionHandler.connectionThread.interrupt();
             ConnectionSingleton.getInstance().connectionHandler.connectionThread = null;
         }
-
-        v.pause();
     }
 
     @Override
@@ -210,32 +197,7 @@ public class Joystick extends SlideMenu implements View.OnTouchListener, SensorE
 
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 
-        v.resume();
     }
-
-    /*private void disconnect() {
-        Log.v(TAG, "DISCONNECT button pressed");
-
-        // STOP CAR IF DISCONNECTED
-        connectionThread.sendData("m" + 0);
-        connectionThread.sendData("t" + 0);
-
-
-        // Disconnect, Set wifi to false
-        Properties.getInstance().wifiStatus = false;
-
-        if (connectionThread != null) {
-            connectionThread.interrupt();
-            connectionThread = null;
-            Intent intent = new Intent(Joystick.this, ConnectionActivity.class);
-            startActivity(intent);
-            msg("Disconnecting");
-        }
-
-//        Intent intent = new Intent(Joystick.this, ConnectionActivity.class);
-//        intent.putExtra(EXTRA_ADDRESS, "==");
-//        startActivity(intent);
-    }*/
 
     private void msg(String s) {
         Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
@@ -243,7 +205,7 @@ public class Joystick extends SlideMenu implements View.OnTouchListener, SensorE
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if(!joySwitch) {
+        if (joySwitch == false) {
             float x = 0, y = 0;
 
             WindowManager windowMgr = (WindowManager) this.getSystemService(WINDOW_SERVICE);
@@ -293,12 +255,12 @@ public class Joystick extends SlideMenu implements View.OnTouchListener, SensorE
                 angle = 90;
             }
 
-            //if (ConnectionSingleton.getInstance().connectionHandler.connected) {
+            if (ConnectionSingleton.getInstance().connectionHandler.connected) {
 
                 ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("m" + speed + "\n");
                 ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("t" + angle + "\n");
 
-            //}
+            }
         }
     }
 
@@ -307,16 +269,56 @@ public class Joystick extends SlideMenu implements View.OnTouchListener, SensorE
 
     }
 
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//
+//        // ATTENTION: This was auto-generated to implement the App Indexing API.
+//        // See https://g.co/AppIndexing/AndroidStudio for more information.
+//        client.connect();
+//        Action viewAction = Action.newAction(
+//                Action.TYPE_VIEW, // TODO: choose an action type.
+//                "Joystick Page", // TODO: Define a title for the content shown.
+//                // TODO: If you have web page content that matches this app activity's content,
+//                // make sure this auto-generated web page URL is correct.
+//                // Otherwise, set the URL to null.
+//                Uri.parse("http://host/path"),
+//                // TODO: Make sure this auto-generated app URL is correct.
+//                Uri.parse("android-app://com.example.thomasemilsson.smartcarapplication/http/host/path")
+//        );
+//        AppIndex.AppIndexApi.start(client, viewAction);
+//    }
+//
+//    @Override
+//    public void onStop() {
+//        super.onStop();
+//
+//        // ATTENTION: This was auto-generated to implement the App Indexing API.
+//        // See https://g.co/AppIndexing/AndroidStudio for more information.
+//        Action viewAction = Action.newAction(
+//                Action.TYPE_VIEW, // TODO: choose an action type.
+//                "Joystick Page", // TODO: Define a title for the content shown.
+//                // TODO: If you have web page content that matches this app activity's content,
+//                // make sure this auto-generated web page URL is correct.
+//                // Otherwise, set the URL to null.
+//                Uri.parse("http://host/path"),
+//                // TODO: Make sure this auto-generated app URL is correct.
+//                Uri.parse("android-app://com.example.thomasemilsson.smartcarapplication/http/host/path")
+//        );
+//        AppIndex.AppIndexApi.end(client, viewAction);
+//        client.disconnect();
+//    }
+
 
     public class MyView extends SurfaceView implements Runnable {
 
         Thread thread = null;
         SurfaceHolder holder;
-        boolean check = false;
+        boolean check = true;
         float radius;
         int quadrant;
 
-
+         boolean paint = true;
 
 
         public MyView(Context context) {
@@ -329,7 +331,7 @@ public class Joystick extends SlideMenu implements View.OnTouchListener, SensorE
         //Thread that repaints the canvas
         public void run() {
 
-            while (check) {
+            while (joySwitch) {
 
                 if (!holder.getSurface().isValid())
                     continue;
@@ -346,19 +348,19 @@ public class Joystick extends SlideMenu implements View.OnTouchListener, SensorE
                 c.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
 
 
-
                 //Drawing the joystick
-                //if(joySwitch) {
-                c.drawBitmap(joybg, c.getWidth() / 2 - joybg.getWidth() / 2, c.getHeight() / 2 - joybg.getHeight() / 2, null);
-                radius = joybg.getWidth() / 2;
+                if (paint) {
+                    c.drawBitmap(joybg, c.getWidth() / 2 - joybg.getWidth() / 2, c.getHeight() / 2 - joybg.getHeight() / 2, null);
+                    radius = joybg.getWidth() / 2;
 
-                if (x == 0 && y == 0)
-                    c.drawBitmap(joy, c.getWidth() / 2 - joy.getWidth() / 2, c.getHeight() / 2 - joy.getHeight() / 2, null);
+                    if (x == 0 && y == 0)
+                        c.drawBitmap(joy, c.getWidth() / 2 - joy.getWidth() / 2, c.getHeight() / 2 - joy.getHeight() / 2, null);
 
 
-                else {
-                    calc(x, y);
-                    c.drawBitmap(joy, x - (joy.getWidth() / 2), y - (joy.getHeight() / 2), null);
+                    else {
+                        calc(x, y);
+                        c.drawBitmap(joy, x - (joy.getWidth() / 2), y - (joy.getHeight() / 2), null);
+                    }
                 }
 
                 holder.unlockCanvasAndPost(c);
@@ -383,6 +385,12 @@ public class Joystick extends SlideMenu implements View.OnTouchListener, SensorE
             check = true;
             thread = new Thread(this);
             thread.start();
+        }
+
+        public boolean stopPaint() {
+            paint = !paint;
+
+            return paint;
         }
 
         //Limits the distance you can drag the joystick using math.
@@ -435,9 +443,7 @@ public class Joystick extends SlideMenu implements View.OnTouchListener, SensorE
 
             car = determineCarAngle(quadrant);
 
-
-
-            if (System.currentTimeMillis() - lastTime > 300) {
+            if(ConnectionSingleton.getInstance().connectionHandler.connected && System.currentTimeMillis() - lastTime > 300){
                 ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("m" + speed + "\n");
                 ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("t" + car + "\n");
                 lastTime = System.currentTimeMillis();
@@ -492,7 +498,6 @@ public class Joystick extends SlideMenu implements View.OnTouchListener, SensorE
     public boolean onTouch(View v, MotionEvent me) {
 
 
-
         switch (me.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 //Get x and y
@@ -516,7 +521,6 @@ public class Joystick extends SlideMenu implements View.OnTouchListener, SensorE
                 y = me.getY();
 
         }
-
 
 
         return true;
