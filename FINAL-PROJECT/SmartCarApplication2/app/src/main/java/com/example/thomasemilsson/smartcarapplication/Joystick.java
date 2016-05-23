@@ -67,8 +67,8 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
     static long lastTime;
     float x, y, dx, dy, h, angle;
 
-    boolean joySwitch;
-    //boolean connected = false;
+    boolean joySwitch = true;
+    boolean connected = false;
 
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
@@ -96,7 +96,7 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.joystick);
 
-        joySwitch = true;
+
         lastTime = System.currentTimeMillis();
 
 
@@ -172,12 +172,13 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
 
         super.onBackPressed();
 
+        v.pause();
+
         if(Properties.getInstance().wifiStatus) {
             ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("close\n");
             ConnectionBoolean.getInstance().activeConnection = false;
         }
 
-        ConnectionSingleton.getInstance().connectionHandler.connected = false;
         Properties.getInstance().wifiStatus = false;
     }
 
@@ -189,6 +190,8 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
             ConnectionSingleton.getInstance().connectionHandler.connectionThread.interrupt();
             ConnectionSingleton.getInstance().connectionHandler.connectionThread = null;
         }
+
+        //v.pause();
     }
 
     @Override
@@ -197,6 +200,7 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
 
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 
+        v.resume();
     }
 
     private void msg(String s) {
@@ -205,7 +209,7 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (joySwitch == false) {
+        if (!joySwitch) {
             float x = 0, y = 0;
 
             WindowManager windowMgr = (WindowManager) this.getSystemService(WINDOW_SERVICE);
@@ -256,7 +260,6 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
             }
 
             if (ConnectionSingleton.getInstance().connectionHandler.connected) {
-
                 ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("m" + speed + "\n");
                 ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("t" + angle + "\n");
 
@@ -269,56 +272,56 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
 
     }
 
-//    @Override
-//    public void onStart() {
-//        super.onStart();
-//
-//        // ATTENTION: This was auto-generated to implement the App Indexing API.
-//        // See https://g.co/AppIndexing/AndroidStudio for more information.
-//        client.connect();
-//        Action viewAction = Action.newAction(
-//                Action.TYPE_VIEW, // TODO: choose an action type.
-//                "Joystick Page", // TODO: Define a title for the content shown.
-//                // TODO: If you have web page content that matches this app activity's content,
-//                // make sure this auto-generated web page URL is correct.
-//                // Otherwise, set the URL to null.
-//                Uri.parse("http://host/path"),
-//                // TODO: Make sure this auto-generated app URL is correct.
-//                Uri.parse("android-app://com.example.thomasemilsson.smartcarapplication/http/host/path")
-//        );
-//        AppIndex.AppIndexApi.start(client, viewAction);
-//    }
-//
-//    @Override
-//    public void onStop() {
-//        super.onStop();
-//
-//        // ATTENTION: This was auto-generated to implement the App Indexing API.
-//        // See https://g.co/AppIndexing/AndroidStudio for more information.
-//        Action viewAction = Action.newAction(
-//                Action.TYPE_VIEW, // TODO: choose an action type.
-//                "Joystick Page", // TODO: Define a title for the content shown.
-//                // TODO: If you have web page content that matches this app activity's content,
-//                // make sure this auto-generated web page URL is correct.
-//                // Otherwise, set the URL to null.
-//                Uri.parse("http://host/path"),
-//                // TODO: Make sure this auto-generated app URL is correct.
-//                Uri.parse("android-app://com.example.thomasemilsson.smartcarapplication/http/host/path")
-//        );
-//        AppIndex.AppIndexApi.end(client, viewAction);
-//        client.disconnect();
-//    }
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Joystick Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app URL is correct.
+                Uri.parse("android-app://com.example.thomasemilsson.smartcarapplication/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(client, viewAction);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Joystick Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app URL is correct.
+                Uri.parse("android-app://com.example.thomasemilsson.smartcarapplication/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(client, viewAction);
+        client.disconnect();
+    }
 
 
     public class MyView extends SurfaceView implements Runnable {
 
         Thread thread = null;
         SurfaceHolder holder;
-        boolean check = true;
+        boolean check = false;
         float radius;
         int quadrant;
 
-         boolean paint = true;
+        boolean paint = true;
 
 
         public MyView(Context context) {
@@ -331,7 +334,7 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
         //Thread that repaints the canvas
         public void run() {
 
-            while (joySwitch) {
+            while (check) {
 
                 if (!holder.getSurface().isValid())
                     continue;
@@ -388,7 +391,10 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
         }
 
         public boolean stopPaint() {
-            paint = !paint;
+            if (paint)
+                paint = false;
+            else
+                paint = true;
 
             return paint;
         }
@@ -443,7 +449,8 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
 
             car = determineCarAngle(quadrant);
 
-            if(ConnectionSingleton.getInstance().connectionHandler.connected && System.currentTimeMillis() - lastTime > 300){
+
+            if (System.currentTimeMillis() - lastTime > 300) {
                 ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("m" + speed + "\n");
                 ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("t" + car + "\n");
                 lastTime = System.currentTimeMillis();
