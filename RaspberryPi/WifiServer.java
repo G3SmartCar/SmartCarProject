@@ -1,5 +1,5 @@
 /*	Server code to run on Raspberry Pi. It will accept an incoming connection from the remote client and forward
-any input through the serial port to the arduino. If the connection is broken server will need to be restarted.
+any input through the serial port to the arduino. 
  */
  
 import java.net.*;
