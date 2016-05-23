@@ -11,6 +11,7 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.transition.Slide;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -22,13 +23,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-public class Tilt extends ConnectionActivity implements SensorEventListener {
+public class Tilt extends SlideMenu implements SensorEventListener {
 
     private static final String TAG = "Tilt";
 
     //ConnectionThread connectionThread;
     ConnectionThread connectionThread;
-    ConnectionHandler connectionHandler;
+    //ConnectionHandler connectionHandler;
     //ConnectionSingleton connectionSingleton;
 
 
@@ -53,7 +54,7 @@ public class Tilt extends ConnectionActivity implements SensorEventListener {
         address = newInt.getStringExtra(ConnectionActivity.EXTRA_ADDRESS);
         Log.d(TAG, "" + address + " =================");
 
-        // SENSOR \\
+        // SENSOR
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         //get the accelerometer sensor
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -61,9 +62,9 @@ public class Tilt extends ConnectionActivity implements SensorEventListener {
 
         // MAKE CONNECTION
 
-            connectionHandler = new ConnectionHandler(connectionThread, address);
-            ConnectionSingleton.getInstance().connectionHandler = connectionHandler;
-            ConnectionBoolean.getInstance().activeConnection = true;
+           ConnectionSingleton.getInstance().connectionHandler = new ConnectionHandler(connectionThread, address);
+            //ConnectionSingleton.getInstance().connectionHandler = connectionHandler;
+            //ConnectionBoolean.getInstance().activeConnection = true;
 
 
         String feedSource = "http://" + IP.getInstance().activeIP + "/html";
@@ -93,7 +94,7 @@ public class Tilt extends ConnectionActivity implements SensorEventListener {
 //        });
 
         // Handle Thread
-        ConnectionSingleton.getInstance().connectionHandler.handleThread();
+        ConnectionSingleton.getInstance().connectionHandler.handleThread(address);
     }
 
     public void toJoy(View view)

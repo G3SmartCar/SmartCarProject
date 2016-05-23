@@ -24,6 +24,10 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -32,6 +36,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.WindowManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
@@ -42,7 +47,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 
-public class Joystick extends SlideMenu implements View.OnTouchListener {
+public class Joystick extends SlideMenu implements View.OnTouchListener, SensorEventListener {
 
     MyView v;
     Bitmap joy;
@@ -57,6 +62,9 @@ public class Joystick extends SlideMenu implements View.OnTouchListener {
 
     boolean joySwitch = true;
     boolean connected = false;
+
+    private SensorManager mSensorManager;
+    private Sensor mAccelerometer;
 
     Canvas c = new Canvas();
     Paint alpha = new Paint();
@@ -82,6 +90,8 @@ public class Joystick extends SlideMenu implements View.OnTouchListener {
 
         lastTime = System.currentTimeMillis();
 
+
+
         // GET ADDRESS
         Intent newInt = getIntent();
         address = newInt.getStringExtra(ConnectionActivity.EXTRA_ADDRESS);
@@ -93,28 +103,23 @@ public class Joystick extends SlideMenu implements View.OnTouchListener {
             ConnectionBoolean.getInstance().activeConnection = true;
         }
 
+
+
         String feedSource = "http://"+ IP.getInstance().activeIP + "/html/";
         WebView view = (WebView) this.findViewById(R.id.webView);
         view.getSettings().setJavaScriptEnabled(true);
         view.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
-
-                // view.loadUrl("javascript:document.getElementsByClassName('container-fluid text-center').style.display = 'none'");
                 view.loadUrl("javascript:document.getElementById(\"mjpeg_dest\").click();");
                 view.loadUrl("javascript:document.getElementById(\"mjpeg_dest\").removeAttribute(\"onclick\");");
 
-
-              /*  view.loadUrl("javascript:document.getElementById('toggle_display').style.display = 'none'");
-                view.loadUrl("javascript:document.getElementById('main-buttons').style.display = 'none'");
-                view.loadUrl("javascript:document.getElementById('secondary-buttons').style.display = 'none'");
-                view.loadUrl("javascript:document.getElementsByClassName('navbar navbar-inverse navbar-fixed-top')[0].style.visibility='hidden'");
-                view.loadUrl("javascript:document.getElementById('accordion').style.display = 'none'");
-                view.loadUrl("javascript:document.getElementById('mjpeg_dest').onclick = null");*/
-
-                //document.getElementById('righttbutton').onclick = null
             }
         });
+
+        // SENSOR
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         view.setInitialScale(240);
         view.loadUrl(feedSource);
@@ -128,13 +133,35 @@ public class Joystick extends SlideMenu implements View.OnTouchListener {
         RelativeLayout surface = (RelativeLayout) findViewById(R.id.joystick);
         surface.addView(v);
 
-            ConnectionSingleton.getInstance().connectionHandler.handleThread();
+            ConnectionSingleton.getInstance().connectionHandler.handleThread(address);
     }
 
-    public void toTilt(View view)
+    public void switchControl(View view)
     {
+        /*ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("close\n");
+        ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("random\n");
+
+        try {
+            ConnectionSingleton.getInstance().connectionHandler.connectionThread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        ConnectionSingleton.getInstance().connectionHandler = null;
         Intent intent = new Intent(Joystick.this, Tilt.class);
-        startActivity(intent);
+        startActivity(intent);*/
+
+        if(joySwitch) {
+            v.pause();
+            joySwitch = false;
+        }
+        else{
+            ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("m" + 0 + "\n");
+            ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("t" + 0 + "\n");
+            v.resume();
+            joySwitch = true;
+        }
+
     }
 
 
@@ -168,12 +195,21 @@ public class Joystick extends SlideMenu implements View.OnTouchListener {
     @Override
     protected void onPause() {
         super.onPause();
+
+        if(ConnectionSingleton.getInstance().connectionHandler.connectionThread != null){
+            ConnectionSingleton.getInstance().connectionHandler.connectionThread.interrupt();
+            ConnectionSingleton.getInstance().connectionHandler.connectionThread = null;
+        }
+
         v.pause();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+
         v.resume();
     }
 
@@ -203,6 +239,72 @@ public class Joystick extends SlideMenu implements View.OnTouchListener {
 
     private void msg(String s) {
         Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if(!joySwitch) {
+            float x = 0, y = 0;
+
+            WindowManager windowMgr = (WindowManager) this.getSystemService(WINDOW_SERVICE);
+
+            int rotationIndex = windowMgr.getDefaultDisplay().getRotation();
+
+            if (rotationIndex == 2 || rotationIndex == 4) {
+                x = (int) event.values[1];
+                y = (int) event.values[0];
+            } else {
+                x = (int) -event.values[0];
+                y = (int) event.values[1];
+            }
+
+            // SOLVE SPEED \\
+            int tempX = (int) Math.abs(x);
+            int tempY = (int) Math.abs(y);
+
+            // 15 is added for increased sensitivity
+            if (tempX > tempY) {
+                speed = ((int) x * 25);
+            } else {
+                speed = ((int) y * 25);
+            }
+
+            if (speed >= 100) {
+                speed = 100;
+            }
+
+
+            // TODO: Test this
+//        if (speed <= -100){
+//            speed = -100;
+//        }
+
+
+            // CHECKS FOR FULL RIGHT and FULL LEFT (90 Degrees)
+            if (x >= 0) {
+                speed = Math.abs(speed);
+            }
+
+            // SOLVE ANGLE \\
+            // 25 added for increased sensitivity
+            angle = (int) y * 25;
+
+            if (angle > 90) {
+                angle = 90;
+            }
+
+            //if (ConnectionSingleton.getInstance().connectionHandler.connected) {
+
+                ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("m" + speed + "\n");
+                ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("t" + angle + "\n");
+
+            //}
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 
 

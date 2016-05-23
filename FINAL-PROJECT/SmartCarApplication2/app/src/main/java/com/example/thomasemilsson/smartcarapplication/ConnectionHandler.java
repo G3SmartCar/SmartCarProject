@@ -26,7 +26,7 @@ public class ConnectionHandler{
         this.address = address;
     }
 
-    public void handleThread() {
+    public void handleThread(String address) {
         connectionThread = new ConnectionThread(address, new Handler() {
 
             @Override
