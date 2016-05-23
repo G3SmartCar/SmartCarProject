@@ -30,6 +30,7 @@ public class WifiServer{
 		if (inputLine.equals("close"){				// If client asks to close connection we do that
 			serverSocket.close();
 			connected=false;
+			break;
 		}
 		else{
         output.sendSerial(inputLine.getBytes());
