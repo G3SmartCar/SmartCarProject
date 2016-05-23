@@ -29,7 +29,6 @@ public class WifiServer{
         while ((inputLine=in.readLine())!=null){	// If we receive data, pass it on to Arduino.
 		if (inputLine.equals("close"){				// If client asks to close connection we do that
 			serverSocket.close();
-			output.close();
 			connected=false;
 		}
 		else{
