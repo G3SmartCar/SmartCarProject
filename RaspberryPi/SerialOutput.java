@@ -1,3 +1,7 @@
+/* Class for serial port communication between Raspberry Pi and Arduino.
+   Source: http://playground.arduino.cc/Interfacing/Java#.Uz1nj3WSxGg except sendSerial().
+*/
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
