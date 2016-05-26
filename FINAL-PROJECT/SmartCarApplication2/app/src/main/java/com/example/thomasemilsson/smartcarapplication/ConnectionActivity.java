@@ -23,7 +23,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Set;
 
-public class ConnectionActivity extends SlideMenu {
+public class ConnectionActivity extends Activity {
 
 
     ListView deviceList;

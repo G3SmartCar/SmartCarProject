@@ -347,22 +347,22 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
                 if (!holder.getSurface().isValid())
                     continue;
 
+
+
+                    //Creating a color that is 100% transparent
+                    alpha.setAlpha(100);
+
+                    c = holder.lockCanvas();
+
+                    //Making sure that the pixels can handle being transparent
+                    holder.setFormat(PixelFormat.TRANSPARENT);
+
+                    //Setting my transparent color as the background of the canvas
+                    c.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+
+
+                    //Drawing the joystick
                 if (paint) {
-
-                //Creating a color that is 100% transparent
-                alpha.setAlpha(100);
-
-                c = holder.lockCanvas();
-
-                //Making sure that the pixels can handle being transparent
-                holder.setFormat(PixelFormat.TRANSPARENT);
-
-                //Setting my transparent color as the background of the canvas
-                c.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-
-
-                //Drawing the joystick
-
                     c.drawBitmap(joybg, c.getWidth() / 2 - joybg.getWidth() / 2, c.getHeight() / 2 - joybg.getHeight() / 2, null);
                     radius = joybg.getWidth() / 2;
 
@@ -375,9 +375,9 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
                         c.drawBitmap(joy, x - (joy.getWidth() / 2), y - (joy.getHeight() / 2), null);
                     }
 
-
-                    holder.unlockCanvasAndPost(c);
                 }
+                    holder.unlockCanvasAndPost(c);
+
             }
 
         }

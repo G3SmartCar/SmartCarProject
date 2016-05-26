@@ -6,7 +6,7 @@ package com.example.thomasemilsson.smartcarapplication;
 public class IP {
     private static IP active = null;
 
-    public static String activeIP = "";
+    public static String activeIP = "172.20.10.6";
 
     protected IP(){}
 

@@ -23,7 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-public class Tilt extends SlideMenu implements SensorEventListener {
+public class Tilt extends ConnectionActivity implements SensorEventListener {
 
     private static final String TAG = "Tilt";
 
