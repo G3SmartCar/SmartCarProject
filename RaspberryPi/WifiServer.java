@@ -1,6 +1,8 @@
-/*	Server code to run on Raspberry Pi. It will accept an incoming connection from the remote client and forward
-any input through the serial port to the arduino. 
- */
+/* Server code to run on Raspberry Pi. It will accept an incoming connection from the remote client and forward
+any input to the arduino through the serial port. If the connection is lost it goes back to waiting for an incoming connection.
+
+Author Mattias Jerrewing
+*/
  
 import java.net.*;
 import java.io.*;
@@ -19,7 +21,7 @@ public class WifiServer{
         try(
         ServerSocket serverSocket=new ServerSocket(portnumber);
         Socket clientSocket=serverSocket.accept();				// Accept incoming connection
-        PrintWriter out=new PrintWriter(clientSocket.getOutputStream(),true); // Output stream if we want to send things back to client.
+        PrintWriter out=new PrintWriter(clientSocket.getOutputStream(),true);   // Output stream if we want to send things back to client.
         BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())); // Inputstream to listen to
         ){
         String inputLine;
@@ -27,13 +29,13 @@ public class WifiServer{
 	connected=true;		// If we get here a connection exists until the client closes it.
 		
         while ((inputLine=in.readLine())!=null){	// If we receive data, pass it on to Arduino.
-		if (inputLine.equals("close"){				// If client asks to close connection we do that
+		if (inputLine.equals("close"){		// If client asks to close connection we close it.
 			serverSocket.close();
 			connected=false;
 			break;
 		}
 		else{
-        output.sendSerial(inputLine.getBytes());
+        output.sendSerial(inputLine.getBytes());	// Send the data to arduino.
         }}}
         catch (IOException e){
         System.out.println("error");
