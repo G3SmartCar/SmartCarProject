@@ -83,7 +83,7 @@ public class ConnectionActivity extends Activity {
                 IP.getInstance().activeIP = textEnterIP.getText().toString();
 
              //   Intent intent = new Intent(ConnectionActivity.this, BasicActivity.class);
-                Intent intent = new Intent(ConnectionActivity.this, Joystick.class);
+                Intent intent = new Intent(ConnectionActivity.this, ConnectionActivity.class);
 
                 intent.putExtra(EXTRA_ADDRESS, "==");
                 // Change Activity
@@ -130,7 +130,7 @@ public class ConnectionActivity extends Activity {
 
             // Make an Intent to change activities
            // Intent intent = new Intent(ConnectionActivity.this, BasicActivity.class);
-            Intent intent = new Intent(ConnectionActivity.this, Joystick.class);
+            Intent intent = new Intent(ConnectionActivity.this, ControlActivity.class);
 
             // Change Activity putExtra() is necessary
             intent.putExtra(EXTRA_ADDRESS, address);

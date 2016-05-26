@@ -1,5 +1,16 @@
 package com.example.thomasemilsson.smartcarapplication;
 
+/**
+ *
+ * @author Thomas Emilsson & Daniel Liang
+
+    We decided to merge this functionallity into the Joystick class so we could avoid having to
+    reconnect both the camera and the controlling connection (Bluetooth/WiFi) each time we swap.
+    So when merged we could maintain the same connection which lead to cleaner functionality and
+    user sexperience.
+
+ */
+
 import android.content.Context;
 import android.content.Intent;
 
@@ -99,7 +110,7 @@ public class Tilt extends ConnectionActivity implements SensorEventListener {
 
     public void toJoy(View view)
     {
-        Intent intent = new Intent(Tilt.this, Joystick.class);
+        Intent intent = new Intent(Tilt.this, ControlActivity.class);
         startActivity(intent);
     }
 

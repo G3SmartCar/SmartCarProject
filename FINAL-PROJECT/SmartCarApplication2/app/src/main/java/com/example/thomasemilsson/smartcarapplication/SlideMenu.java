@@ -91,7 +91,7 @@ public class SlideMenu extends AppCompatActivity
         int id = item.getItemId();
 
         if(id == R.id.nav_first_layout){
-            Intent intent = new Intent(SlideMenu.this, Joystick.class);
+            Intent intent = new Intent(SlideMenu.this, ControlActivity.class);
             startActivity(intent);
         }
 
@@ -134,7 +134,7 @@ public class SlideMenu extends AppCompatActivity
 
             switch (position) {
                 case 0: {
-                    Intent intent = new Intent(SlideMenu.this, Joystick.class);
+                    Intent intent = new Intent(SlideMenu.this, ControlActivity.class);
                     startActivity(intent);
                     break;
                 }
