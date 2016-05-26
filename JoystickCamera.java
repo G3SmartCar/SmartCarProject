@@ -1,12 +1,14 @@
-package com.example.thomasemilsson.smartcarapplication;
+package com.example.amandahoffstrom.smartcar1;
 
 /**
  * Created by Axel on 14-Apr-16.
  *
  * @author Axel Slättman
- * 15/04/2016
+ * Camera by Aras Bazyan
+ * Bluetooth by Thomas Emilsson
+ * 09/05/2016
  *
- * Version 0.0.0.6
+ * Version 0.0.1.0
  */
 
 
@@ -17,88 +19,119 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PixelFormat;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 
-public class Joystick extends BluetoothActivity implements View.OnTouchListener {
+public class JoystickCamera extends SlideMenu
+        implements View.OnTouchListener {
 
     MyView v;
     Bitmap joy;
     Bitmap joybg;
+    Bitmap cameraFeed;
+
+    private String IPAddress;
 
     private static final String TAG = "Joystick";
 
     int zeroX, zeroY, car, speed;
     float x, y, dx, dy, h, angle;
 
-    boolean go = false;
+    boolean joySwitch = true;
 
     Canvas c = new Canvas();
     Paint red = new Paint();
+    Paint alpha = new Paint();
 
     BluetoothThread bluetoothThread;
     boolean connect = true;
     private String address, status, addressText;
 
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //setContentView(R.layout.joystick_layout);
+
+        FrameLayout frameLayout = (FrameLayout)findViewById(R.id.activity_frame);
+        LayoutInflater layoutInflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View activityView = layoutInflater.inflate(R.layout.joystick_layout, null,false);
+        frameLayout.addView(activityView);
+
+        startActivity(new Intent(JoystickCamera.this, BluetoothActivity.class));
+
+
+        // Get the IPAddress from BluetoothActivity
+        String IP = getIntent().getStringExtra("IPAddress");
+        setIPAddress(IP);
 
         // GET ADDRESS
         Intent newInt = getIntent();
         address = newInt.getStringExtra(BluetoothActivity.EXTRA_ADDRESS);
+
+        //172.20.10.6 - IP format
+        //Get the url to camera feed, using the IPAddress given from BluetoothActivity
+        String feedSource = "http://" + IPAddress + "/html/";
+        WebView view = (WebView) this.findViewById(R.id.webView);
+        view.getSettings().setJavaScriptEnabled(true);
+        view.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+
+                // view.loadUrl("javascript:document.getElementsByClassName('container-fluid text-center').style.display = 'none'");
+                view.loadUrl("javascript:document.getElementById(\"mjpeg_dest\").click();");
+                view.loadUrl("javascript:document.getElementById(\"mjpeg_dest\").removeAttribute(\"onclick\");");
+              /*  view.loadUrl("javascript:document.getElementById('toggle_display').style.display = 'none'");
+                view.loadUrl("javascript:document.getElementById('main-buttons').style.display = 'none'");
+                view.loadUrl("javascript:document.getElementById('secondary-buttons').style.display = 'none'");
+                view.loadUrl("javascript:document.getElementsByClassName('navbar navbar-inverse navbar-fixed-top')[0].style.visibility='hidden'");
+                view.loadUrl("javascript:document.getElementById('accordion').style.display = 'none'");
+                view.loadUrl("javascript:document.getElementById('mjpeg_dest').onclick = null");*/
+
+                //document.getElementById('righttbutton').onclick = null
+            }
+        });
+
+        view.setInitialScale(240);
+        view.loadUrl(feedSource);
 
         v = new MyView(this);
         v.setOnTouchListener(this);
         joy = BitmapFactory.decodeResource(getResources(), R.drawable.joy1);
         joybg = BitmapFactory.decodeResource(getResources(), R.drawable.joybg);
 
-        setContentView(v);
+
+        RelativeLayout surface = (RelativeLayout) findViewById(R.id.joystick);
+        surface.addView(v);
 
         if (connect)
             handleThread();
     }
 
-    public static Bitmap getCameraImage(String str){
-        try{
-            URL url = new URL(str);
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setDoInput(true);
-            con.connect();
-            InputStream input = con.getInputStream();
-            Bitmap bit = BitmapFactory.decodeStream(input);
-            return bit;
-        }
-        catch (IOException e){
-            System.out.println(e);
-            return null;
-        }
-    }
 
-    /* public void run(){
-         try{
-             bluetoothThread.sendData("m" + speed);
-             bluetoothThread.sendData("t" + car);
-         }catch(Exception e){
-             System.out.println(e);
-         }
-
-         try {
-             Thread.sleep(100);
-         } catch (InterruptedException e) {
-         }
-     }
- */
     private void handleThread() {
         bluetoothThread = new BluetoothThread(address, new Handler() {
 
@@ -145,7 +178,7 @@ public class Joystick extends BluetoothActivity implements View.OnTouchListener 
         if (bluetoothThread != null) {
             bluetoothThread.interrupt();
             bluetoothThread = null;
-            Intent intent = new Intent(Joystick.this, BluetoothActivity.class);
+            Intent intent = new Intent(JoystickCamera.this, BluetoothActivity.class);
             startActivity(intent);
             msg("Disconnecting");
         }
@@ -163,13 +196,15 @@ public class Joystick extends BluetoothActivity implements View.OnTouchListener 
         boolean check = false;
         float radius;
         int quadrant;
+
         String xText, yText, angleText, hypo, speedText, carText;
-        Bitmap cameraFeed;
+
 
 
         public MyView(Context context) {
             super(context);
             holder = getHolder();
+            setZOrderOnTop(true);
         }
 
         //Thread that repaints the canvas
@@ -183,37 +218,37 @@ public class Joystick extends BluetoothActivity implements View.OnTouchListener 
                 red.setStyle(Paint.Style.STROKE);
                 red.setStrokeWidth(3);
                 red.setTextSize(30);
-
-                cameraFeed = getCameraImage("url");
+                alpha.setAlpha(100);
 
                 c = holder.lockCanvas();
-                c.drawARGB(255, 255, 255, 255);
 
-                c.drawBitmap(cameraFeed);
+                holder.setFormat(PixelFormat.TRANSPARENT);
 
+                c.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+                c.drawBitmap(joybg, c.getWidth() / 2 - joybg.getWidth() / 2, c.getHeight() / 2 - joybg.getHeight() / 2, null);
+                radius = joybg.getWidth()/2;
+                //if(joySwitch) {
                 c.drawBitmap(joybg, c.getWidth() / 2 - joybg.getWidth() / 2, c.getHeight() / 2 - joybg.getHeight() / 2, null);
                 radius = joybg.getWidth() / 2;
-                if (x == 0 && y == 0) {
-                    go = false;
+                if (x == 0 && y == 0)
                     c.drawBitmap(joy, c.getWidth() / 2 - joy.getWidth() / 2, c.getHeight() / 2 - joy.getHeight() / 2, null);
-                    car = speed = 0;
-                } else {
-                    go = true;
+
+                else {
                     calc(x, y);
                     c.drawBitmap(joy, x - (joy.getWidth() / 2), y - (joy.getHeight() / 2), null);
                 }
-                xText = "X = " + (int) dx;
-                yText = "Y = " + (int) dy;
-                angleText = "angle = " + (int) (angle * 180 / Math.PI);
-                hypo = "Hypo = " + (int) h;
+               /* xText = "X = " + (int)dx;
+                yText = "Y = " + (int)dy;
+                angleText = "angle = " + (int)(angle*180/Math.PI);
+                hypo = "Hypo = " + (int)h;
                 speedText = "Speed = " + speed;
                 carText = "Angle for car = " + car;
-                c.drawText(xText, 100, 100, red);
-                c.drawText(yText, 100, 150, red);
-                c.drawText(angleText, 100, 200, red);
-                c.drawText(hypo, 100, 250, red);
-                c.drawText(speedText, 100, 300, red);
-                c.drawText(carText, 100, 350, red);
+                c.drawText(xText,100,100,red);
+                c.drawText(yText,100,150,red);
+                c.drawText(angleText,100,200,red);
+                c.drawText(hypo,100,250,red);
+                c.drawText(speedText,100,300,red);
+                c.drawText(carText,100,350,red);*/
 
                 holder.unlockCanvasAndPost(c);
             }
@@ -360,7 +395,10 @@ public class Joystick extends BluetoothActivity implements View.OnTouchListener 
         return true;
     }
 
+    public void setIPAddress(String IPAddress){
+        this.IPAddress = IPAddress;
+    }
+
 
 }
-
 
