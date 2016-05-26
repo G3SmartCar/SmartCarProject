@@ -3,18 +3,14 @@ package com.example.thomasemilsson.smartcarapplication;
 /**
  * Created by Axel on 14-Apr-16.
  *
- * @author              Axel Slättman
- * Camera               by Aras Bazyan
- * Bluetooth            by Thomas Emilsson
+ * @author         Axel Slättman
+ * Camera       by Aras Bazyan
+ * Bluetooth    by Thomas Emilsson
  * 09/05/2016
  *
- * Wifi                 by Thomas Emilsson
- * Integration          Thomas/Axel
+ * Wifi         by Thomas Emilsson
+ * Integration  Thomas/Axel
  * 20/05/2016
- *
- * Tilt                 by Thomas Emilsson & Daniel
- *
- * Final Integration    by Thomas/Axel
  * Version 1.3.2.1
  */
 
@@ -60,7 +56,7 @@ import java.net.URL;
 
 public class Joystick extends ConnectionActivity implements View.OnTouchListener, SensorEventListener {
 
-    MyView v;
+    JoystickView v;
     Bitmap joy;
     Bitmap joybg;
     Bitmap cameraFeed;
@@ -72,7 +68,7 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
     float x, y, dx, dy, h, angle;
 
     boolean joySwitch = true;
-    boolean connected = false;
+    boolean sendData = true;
 
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
@@ -115,6 +111,8 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
             ConnectionBoolean.getInstance().activeConnection = true;
         }
 
+        sendData = true;
+
 
         String feedSource = "http://" + IP.getInstance().activeIP + "/html/";
         WebView view = (WebView) this.findViewById(R.id.webView);
@@ -135,7 +133,7 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
         view.setInitialScale(240);
         view.loadUrl(feedSource);
 
-        v = new MyView(this);
+        v = new JoystickView(this);
         v.setOnTouchListener(this);
         joy = BitmapFactory.decodeResource(getResources(), R.drawable.joy1);
         joybg = BitmapFactory.decodeResource(getResources(), R.drawable.joybg);
@@ -176,7 +174,11 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
 
         super.onBackPressed();
 
-        v.pause();
+        sendData = false;
+
+        if(joySwitch) {
+            v.pause();
+        }
 
         if(Properties.getInstance().wifiStatus) {
             ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("close\n");
@@ -263,10 +265,12 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
                 angle = 90;
             }
 
-            if (ConnectionSingleton.getInstance().connectionHandler.connected) {
-                ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("m" + speed + "\n");
-                ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("t" + angle + "\n");
+            if(sendData) {
+                if (ConnectionSingleton.getInstance().connectionHandler.connected) {
+                    ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("m" + speed + "\n");
+                    ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("t" + angle + "\n");
 
+                }
             }
         }
     }
@@ -317,7 +321,7 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
     }
 
 
-    public class MyView extends SurfaceView implements Runnable {
+    public class JoystickView extends SurfaceView implements Runnable {
 
         Thread thread = null;
         SurfaceHolder holder;
@@ -328,7 +332,7 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
         boolean paint = true;
 
 
-        public MyView(Context context) {
+        public JoystickView(Context context) {
             super(context);
             holder = getHolder();
             setZOrderOnTop(true);
@@ -343,6 +347,8 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
                 if (!holder.getSurface().isValid())
                     continue;
 
+                if (paint) {
+
                 //Creating a color that is 100% transparent
                 alpha.setAlpha(100);
 
@@ -356,7 +362,7 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
 
 
                 //Drawing the joystick
-                if (paint) {
+
                     c.drawBitmap(joybg, c.getWidth() / 2 - joybg.getWidth() / 2, c.getHeight() / 2 - joybg.getHeight() / 2, null);
                     radius = joybg.getWidth() / 2;
 
@@ -368,9 +374,10 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
                         calc(x, y);
                         c.drawBitmap(joy, x - (joy.getWidth() / 2), y - (joy.getHeight() / 2), null);
                     }
-                }
 
-                holder.unlockCanvasAndPost(c);
+
+                    holder.unlockCanvasAndPost(c);
+                }
             }
 
         }
