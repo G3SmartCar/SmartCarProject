@@ -3,6 +3,12 @@ package com.example.thomasemilsson.smartcarapplication;
 /**
  * Created by thomasemilsson on 5/22/16.
  */
+
+
+/** 
+ * Add description on the purpose and how to use this class
+ */
+
 public class ConnectionSingleton {
 
     private static ConnectionSingleton active = null;
