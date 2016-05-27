@@ -2,6 +2,7 @@ package com.example.thomasemilsson.smartcarapplication;
 
 /**
  * Created by thomasemilsson on 5/12/16.
+ * TODO: Add description to class and all(I can help here) public methods
  */
 
 import android.app.Activity;
@@ -20,10 +21,32 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+// Nav Drawer imports, might be duplicates. Will tidy up here on Sunday
+
+import android.app.FragmentManager;
+import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.transition.Slide;
+import android.view.View;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.content.Intent;
+import android.widget.ListView;
+import android.widget.AdapterView;
+
 import java.util.ArrayList;
 import java.util.Set;
 
-public class ConnectionActivity extends Activity {
+public class ConnectionActivity extends Activity
+                    // implements NavigationView.OnNavigationIntemSelectedListener
+{
 
 
     ListView deviceList;
@@ -37,12 +60,26 @@ public class ConnectionActivity extends Activity {
 
     public static String EXTRA_ADDRESS = "device_address";
 
+    
+    /**
+     * Navigation Drawer is created in onCreate...
+     */
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connection);
         //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
+        
+    
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+        
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
 
         // initialize variable views
@@ -93,6 +130,8 @@ public class ConnectionActivity extends Activity {
             }
         });
     }
+    
+    
 
 
     // Go through all paired Devices, and
@@ -166,6 +205,61 @@ public class ConnectionActivity extends Activity {
     public void message(String s) {
         Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
     }
+
+    @Override
+    public void onBackPressed() {
+    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.END)) {
+            drawer.closeDrawer(GravityCompat.END);
+        } else {
+            super.onBackPressed();
+            }
+        }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+
+
+    int id = item.getItemId();
+
+    if(id == R.id.nav_first_layout){
+        Intent intent = new Intent(ConnectionActivity.this, ControlActivity.class);
+        startActivity(intent);
+            }
+
+    /*else if(id == R.id.nav_second_layout){
+ Intent intent = new Intent(SlideMenu.this, TiltControl.class);
+ startActivity(intent);
+ }*/
+
+// Handle navigation view item clicks here.
+//int id = item.getItemId();
+
+// FragmentManager fm = getFragmentManager();
+
+// MenuItem to enable Joystick
+//if (id == R.id.nav_first_layout) {
+//    fm.beginTransaction()
+//            .replace(R.id.content_joystick,
+//                    new Test())
+//            .commit();
+// MenuItem to enable Tilt
+//  } else if (id == R.id.nav_second_layout) {
+//     fm.beginTransaction()
+//             .replace(R.id.content_tilt,
+//                     new Tilt())
+//             .commit();
+//  Intent intent
+
+//}
+
+
+    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+    drawer.closeDrawer(GravityCompat.END);
+    return true;
+    }
+
 }
 
 
