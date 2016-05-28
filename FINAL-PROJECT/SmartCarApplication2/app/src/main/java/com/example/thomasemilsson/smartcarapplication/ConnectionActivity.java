@@ -41,6 +41,8 @@ import android.content.Intent;
 import android.widget.ListView;
 import android.widget.AdapterView;
 
+import android.widget.EditText;
+
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -52,6 +54,8 @@ public class ConnectionActivity extends Activity
     ListView deviceList;
     TextView textEnterIP;
     Button connectButton;
+    
+    EditText enterIPAddress;
 
     boolean display = true;
 
@@ -59,6 +63,9 @@ public class ConnectionActivity extends Activity
     private Set<BluetoothDevice> pairedDevices;
 
     public static String EXTRA_ADDRESS = "device_address";
+    
+    private String IPAddress;
+    private final Pattern IPRegEx = Pattern.compile("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]).){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$");
 
     
     /**
@@ -93,6 +100,13 @@ public class ConnectionActivity extends Activity
         //textEnterIP.setText("192.168.43.220");
         textEnterIP.setText("172.20.10.6");
         //textEnterIP.setText("192.168.43.140");
+        
+        
+        // Will be used after demo, when user enters the IP him-/herself
+        
+        //enterIPAddress = (EditText) findViewById(R.id.EditText);
+        //String IP = enterIPAddress.getText().toString();
+        setIPAddress(IP);
 
         // Check for existing bluetooth connection
         if (myBluetooth == null) {
@@ -228,36 +242,33 @@ public class ConnectionActivity extends Activity
         startActivity(intent);
             }
 
-    /*else if(id == R.id.nav_second_layout){
- Intent intent = new Intent(SlideMenu.this, TiltControl.class);
- startActivity(intent);
- }*/
-
-// Handle navigation view item clicks here.
-//int id = item.getItemId();
-
-// FragmentManager fm = getFragmentManager();
-
-// MenuItem to enable Joystick
-//if (id == R.id.nav_first_layout) {
-//    fm.beginTransaction()
-//            .replace(R.id.content_joystick,
-//                    new Test())
-//            .commit();
-// MenuItem to enable Tilt
-//  } else if (id == R.id.nav_second_layout) {
-//     fm.beginTransaction()
-//             .replace(R.id.content_tilt,
-//                     new Tilt())
-//             .commit();
-//  Intent intent
-
-//}
-
 
     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
     drawer.closeDrawer(GravityCompat.END);
     return true;
+}
+
+ /**
+  * A method to set the IPAddress, and to check for the right format with RegExp.
+  * If format in not right user is prompted to enter a valid IP.
+  *
+  * @param IPAddress enter by the user
+  */
+
+    public void setIPAddress(String IPAddress){
+
+        if (!IPRegEx.matcher(IPAddress).matches()){
+
+    //put this text in a textbox in the app
+    System.out.println("Not a valid IP Address, please try again");
+    enterIPAddress.setText("Please enter a valid IP address", TextView.BufferType.EDITABLE);
+    enterIPAddress.selectAll();
+    }
+
+    else {
+        this.IPAddress = IPAddress;
+
+        }
     }
 
 }
