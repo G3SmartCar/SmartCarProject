@@ -10,6 +10,7 @@ import android.view.View;
 
 /**
  * Created by thomasemilsson on 5/22/16.
+  * TODO: Add description to (class) and public methods (I can help here) in proper standard
  */
 
 // ConnectionHandler class keeps track of a ConnectionThread instance and handles the thread and how to disconnect

@@ -26,6 +26,7 @@ import java.util.UUID;
 
 /**
  * Created by thomasemilsson on 4/13/16.
+ * TODO: Add description to class and public methods (I can help here) in proper standard
  */
 public class ConnectionThread extends Thread {
 
