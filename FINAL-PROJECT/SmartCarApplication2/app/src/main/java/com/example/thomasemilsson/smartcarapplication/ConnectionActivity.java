@@ -85,8 +85,8 @@ public class ConnectionActivity extends Activity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
         
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+       // NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+       // navigationView.setNavigationItemSelectedListener(this);
 
 
         // initialize variable views
