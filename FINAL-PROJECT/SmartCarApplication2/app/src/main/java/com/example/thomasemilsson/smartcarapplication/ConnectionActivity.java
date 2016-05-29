@@ -242,9 +242,14 @@ public class ConnectionActivity extends Activity
     int id = item.getItemId();
 
     if(id == R.id.nav_first_layout){
-        Intent intent = new Intent(ConnectionActivity.this, ControlActivity.class);
+        Intent appIntent = new Intent(ConnectionActivity.this, AboutUsActivity.class);
         startActivity(intent);
             }
+
+    else if (id == R.id.nav_second_layout){
+        Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.arduino.cc/");
+        startActivity(webIntent);
+    }
 
 
     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
