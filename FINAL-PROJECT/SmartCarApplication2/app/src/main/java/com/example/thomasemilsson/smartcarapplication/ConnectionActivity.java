@@ -3,6 +3,8 @@ package com.example.thomasemilsson.smartcarapplication;
 /**
  * Created by thomasemilsson on 5/12/16.
  * TODO: Add description to class and all(I can help here) public methods
+ * This class connects to to RaspberryPi, Arduino through bluetooth or wifi. 
+ *
  */
 
 import android.app.Activity;
@@ -146,10 +148,12 @@ public class ConnectionActivity extends Activity
     }
     
     
-
-
-    // Go through all paired Devices, and
-    // put them in ArrayAdapter to be displayed
+    
+    /**
+     * Method that goes through all paried Devices,
+     * and puts them in ArrayAdapter to be displayed
+     */
+    
     private void showDeviceList() {
         pairedDevices = myBluetooth.getBondedDevices();
         ArrayList list = new ArrayList();
@@ -252,7 +256,7 @@ public class ConnectionActivity extends Activity
   * A method to set the IPAddress, and to check for the right format with RegExp.
   * If format in not right user is prompted to enter a valid IP.
   *
-  * @param IPAddress enter by the user
+  * @param IPAddress entered by the user
   */
 
     public void setIPAddress(String IPAddress){

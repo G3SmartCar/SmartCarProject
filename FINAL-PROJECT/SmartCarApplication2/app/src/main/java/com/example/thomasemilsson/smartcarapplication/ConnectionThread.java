@@ -2,6 +2,8 @@ package com.example.thomasemilsson.smartcarapplication;
 
 /**
  * Created by thomasemilsson on 5/18/16.
+ *
+ * This class opens a thread for the bluetooth/wifi connection
  */
 
 import android.app.Application;
@@ -69,7 +71,11 @@ public class ConnectionThread extends Thread {
 
     }
 
-    // Getter for writeHandler
+    /**
+     * A getter method to access the private variable writeHandler
+     *@return a Handler to (....)
+     */
+    
     public Handler getWriteHandler() {
         return writeHandler;
     }
@@ -132,6 +138,12 @@ public class ConnectionThread extends Thread {
 
 
     // Write data to the socket
+    
+    /**
+     * This method writes data to the socket
+     *@param String to be written to socket
+     */
+    
     private void write(String s) {
         try {
             s += SPACER;
