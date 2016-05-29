@@ -2,6 +2,9 @@ package com.example.thomasemilsson.smartcarapplication;
 
 /**
  * Created by thomasemilsson on 5/12/16.
+ * TODO: Add description to class and all(I can help here) public methods
+ * This class connects to to RaspberryPi, Arduino through bluetooth or wifi. 
+ *
  */
 
 import android.app.Activity;
@@ -20,15 +23,41 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+// Nav Drawer imports, might be duplicates. Will tidy up here on Sunday
+
+import android.app.FragmentManager;
+import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.transition.Slide;
+import android.view.View;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.content.Intent;
+import android.widget.ListView;
+import android.widget.AdapterView;
+
+import android.widget.EditText;
+
 import java.util.ArrayList;
 import java.util.Set;
 
-public class ConnectionActivity extends Activity {
+public class ConnectionActivity extends Activity
+                    // implements NavigationView.OnNavigationIntemSelectedListener
+{
 
 
     ListView deviceList;
     TextView textEnterIP;
     Button connectButton;
+    
+    EditText enterIPAddress;
 
     boolean display = true;
 
@@ -36,13 +65,30 @@ public class ConnectionActivity extends Activity {
     private Set<BluetoothDevice> pairedDevices;
 
     public static String EXTRA_ADDRESS = "device_address";
+    
+    private String IPAddress;
+    private final Pattern IPRegEx = Pattern.compile("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]).){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$");
 
+    
+    /**
+     * Navigation Drawer is created in onCreate...
+     */
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connection);
         //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
+        
+    
+       // DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+       // ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+       // drawer.setDrawerListener(toggle);
+       // toggle.syncState();
+        
+       // NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+       // navigationView.setNavigationItemSelectedListener(this);
 
 
         // initialize variable views
@@ -56,6 +102,13 @@ public class ConnectionActivity extends Activity {
         //textEnterIP.setText("192.168.43.220");
         textEnterIP.setText("172.20.10.6");
         //textEnterIP.setText("192.168.43.140");
+        
+        
+        // Will be used after demo, when user enters the IP him-/herself
+        
+        //enterIPAddress = (EditText) findViewById(R.id.EditText);
+        //String IP = enterIPAddress.getText().toString();
+        setIPAddress(IP);
 
         // Check for existing bluetooth connection
         if (myBluetooth == null) {
@@ -93,10 +146,14 @@ public class ConnectionActivity extends Activity {
             }
         });
     }
-
-
-    // Go through all paired Devices, and
-    // put them in ArrayAdapter to be displayed
+    
+    
+    
+    /**
+     * Method that goes through all paried Devices,
+     * and puts them in ArrayAdapter to be displayed
+     */
+    
     private void showDeviceList() {
         pairedDevices = myBluetooth.getBondedDevices();
         ArrayList list = new ArrayList();
@@ -166,6 +223,58 @@ public class ConnectionActivity extends Activity {
     public void message(String s) {
         Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
     }
+
+    @Override
+    public void onBackPressed() {
+    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.END)) {
+            drawer.closeDrawer(GravityCompat.END);
+        } else {
+            super.onBackPressed();
+            }
+        }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+
+
+    int id = item.getItemId();
+
+    if(id == R.id.nav_first_layout){
+        Intent intent = new Intent(ConnectionActivity.this, ControlActivity.class);
+        startActivity(intent);
+            }
+
+
+    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+    drawer.closeDrawer(GravityCompat.END);
+    return true;
+}
+
+ /**
+  * A method to set the IPAddress, and to check for the right format with RegExp.
+  * If format in not right user is prompted to enter a valid IP.
+  *
+  * @param IPAddress entered by the user
+  */
+
+    public void setIPAddress(String IPAddress){
+
+        if (!IPRegEx.matcher(IPAddress).matches()){
+
+    //put this text in a textbox in the app
+    System.out.println("Not a valid IP Address, please try again");
+    enterIPAddress.setText("Please enter a valid IP address", TextView.BufferType.EDITABLE);
+    enterIPAddress.selectAll();
+    }
+
+    else {
+        this.IPAddress = IPAddress;
+
+        }
+    }
+
 }
 
 

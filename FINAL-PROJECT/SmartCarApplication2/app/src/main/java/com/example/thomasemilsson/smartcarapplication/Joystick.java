@@ -12,6 +12,8 @@ package com.example.thomasemilsson.smartcarapplication;
  * Integration  Thomas/Axel
  * 20/05/2016
  * Version 1.3.2.1
+ *
+ * TODO: Add description to class and public methods (I can help here) in proper standard
  */
 
 
