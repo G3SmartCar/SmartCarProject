@@ -19,7 +19,8 @@ public class ConnectionSingleton {
         this.connectionHandler = connectionHandler;
     }
     /**
-     * Singleton pattern to make sure only one instance of this class will be created throughtout the product
+     * Singleton pattern to make sure only one instance of this class will be created throughtout the application
+     * lifetime
      * @return an instance of this class
      */
     public static synchronized ConnectionSingleton getInstance(){
