@@ -38,9 +38,19 @@ void handleInput(String input) { //handle serial input if there is any
   time = millis();
 
   unsigned int distance = sonar.ping() / 100;
-  
+   int setting = 20;
+   
   if (input.startsWith("m")) {
     int throttle = input.substring(1).toInt();
+    
+    // Changes stopping distance based on speed of car
+    if (throttle >= 90)
+      setting = 40;
+    else if (throttle >= 50 && throttle < 90)
+      setting = 30;
+    else if (throttle > 0 && throttle < 50)
+      setting = 20;
+      
           if (distance<16.0 && distance>0.0 && throttle>0) {
             throttle=0;
           }
