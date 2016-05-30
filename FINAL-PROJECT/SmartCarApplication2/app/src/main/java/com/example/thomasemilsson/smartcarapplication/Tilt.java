@@ -2,7 +2,8 @@ package com.example.thomasemilsson.smartcarapplication;
 
 /**
  *
- * @author Thomas Emilsson & Daniel Liang
+ * @author Thomas Emilsson 
+ * @author Zhanou Liang(Daniel)
 
     We decided to merge this functionallity into the Joystick class so we could avoid having to
     reconnect both the camera and the controlling connection (Bluetooth/WiFi) each time we swap.
