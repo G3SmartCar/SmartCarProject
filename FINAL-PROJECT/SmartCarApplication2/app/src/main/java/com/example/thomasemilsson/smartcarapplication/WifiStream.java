@@ -4,7 +4,8 @@ import java.io.OutputStream;
 
 /**
  * Created by thomasemilsson on 5/18/16.
- *  * TODO: Add description to class
+ *  Used to store the type of outstream currently active
+ *  Unused in our project, but important for future updates to project
  */
 public class WifiStream {
     private static WifiStream active = null;
