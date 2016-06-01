@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+// OLD VERSION OF CONNECTIONACTIVITY CLASS
 
 public class BasicActivity extends ConnectionActivity implements SensorEventListener {
 
