@@ -1,3 +1,6 @@
+// @author thomasemilsson
+// @author mattiasjerrewing
+
 #include <Smartcar.h>
 #include <NewPing.h>
 Car car;
