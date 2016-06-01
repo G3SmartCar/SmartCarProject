@@ -9,7 +9,8 @@ package com.example.thomasemilsson.smartcarapplication;
  * 09/05/2016
  *
  * Wifi         by Thomas Emilsson
- * Integration  Thomas/Axel
+ * Integration  Thomas Emilsson & Axel Slättman
+ * Tilt Control by Thomas Emilsson & Daniel Liang
  * 20/05/2016
  * Version 1.3.2.1
  */
@@ -45,7 +46,11 @@ import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 
-
+/**
+ * This class is responsible for all the controlling of the car. The user can switch the type
+ * of controller he is using by a button on the right hand of the screen. 
+ */
+ 
 public class ControlActivity extends ConnectionActivity implements View.OnTouchListener, SensorEventListener {
 
     JoystickView v;
@@ -60,13 +65,14 @@ public class ControlActivity extends ConnectionActivity implements View.OnTouchL
     boolean joySwitch = true;
     boolean sendData = true;
 
+    // Handles the tilt of the phone
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
 
     Canvas c = new Canvas();
     Paint alpha = new Paint();
 
-
+    // create a connection thread/handler
     ConnectionThread connectionThread;
     ConnectionHandler connectionHandler;
 
@@ -254,6 +260,7 @@ public class ControlActivity extends ConnectionActivity implements View.OnTouchL
                 angle = 90;
             }
 
+            // After calculation the speed and angle, send the data to the raspberryPi/bluetooth
             if(sendData) {
                 if (ConnectionSingleton.getInstance().connectionHandler.connected) {
                     ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("m" + speed + "\n");
