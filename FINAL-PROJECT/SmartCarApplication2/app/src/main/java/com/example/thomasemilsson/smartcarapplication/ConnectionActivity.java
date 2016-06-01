@@ -48,6 +48,15 @@ import android.widget.EditText;
 import java.util.ArrayList;
 import java.util.Set;
 
+/**
+ * This is the main page of the application. The user is shown two possible
+ * types of connections: Bluetooth or Wifi. To app shows a list of bluetooth devices
+ * the user is paired to and a box for entering an IP to connect to. After pressing
+ * either the connect button or a paired bluetooth device, the phone connects to the
+ * appropriately and the next page is opened where the user can move around the car
+ * using a joystick or the tilt of his/her phone.
+ */
+ 
 public class ConnectionActivity extends Activity
                     // implements NavigationView.OnNavigationIntemSelectedListener
 {
