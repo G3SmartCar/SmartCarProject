@@ -11,6 +11,8 @@ package com.example.thomasemilsson.smartcarapplication;
  * Wifi         by Thomas Emilsson
  * Integration  Thomas/Axel
  * 20/05/2016
+ * 
+ * Tilt Control by Thomas Emilsson & Daniel Liang
  * Version 1.3.2.1
  *
  * TODO: Add description to class and public methods (I can help here) in proper standard
@@ -72,6 +74,7 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
     boolean joySwitch = true;
     boolean sendData = true;
 
+    // handles the Tilt Sensors for the phone
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
 
@@ -79,6 +82,7 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
     Paint alpha = new Paint();
 
 
+    // Create a connection thread/handler
     ConnectionThread connectionThread;
     ConnectionHandler connectionHandler;
 
@@ -116,6 +120,7 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
         sendData = true;
 
 
+        // LOAD CAMERA
         String feedSource = "http://" + IP.getInstance().activeIP + "/html/";
         WebView view = (WebView) this.findViewById(R.id.webView);
         view.getSettings().setJavaScriptEnabled(true);
@@ -236,7 +241,7 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
             int tempX = (int) Math.abs(x);
             int tempY = (int) Math.abs(y);
 
-            // 15 is added for increased sensitivity
+            // 25 is added for increased sensitivity
             if (tempX > tempY) {
                 speed = ((int) x * 25);
             } else {
@@ -267,6 +272,7 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
                 angle = 90;
             }
 
+            // After angle and speed have been calculated, send the data to the car
             if(sendData) {
                 if (ConnectionSingleton.getInstance().connectionHandler.connected) {
                     ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("m" + speed + "\n");
@@ -463,6 +469,7 @@ public class Joystick extends ConnectionActivity implements View.OnTouchListener
             car = determineCarAngle(quadrant);
 
 
+            // Used to slow down how often the joystick sends data
             if (System.currentTimeMillis() - lastTime > 300) {
                 ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("m" + speed + "\n");
                 ConnectionSingleton.getInstance().connectionHandler.connectionThread.sendData("t" + car + "\n");
