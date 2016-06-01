@@ -28,7 +28,12 @@ import java.util.UUID;
 
 /**
  * Created by thomasemilsson on 4/13/16.
- * TODO: Add description to class and public methods (I can help here) in proper standard
+ * Class responsible for the connection thread between either bluetooth or Wifi. 
+ * Initializes the approriate sockets and outstreams dependent on whether a wifi
+ * connection or a bluetooth one is being made
+ * 
+ * Instream is also initialized in case data is to be received. However, in this project, 
+ * we end up not using these methods
  */
 public class ConnectionThread extends Thread {
 
@@ -161,6 +166,8 @@ public class ConnectionThread extends Thread {
         Log.d(TAG, "" + Properties.getInstance().wifiStatus + " ======= ");
 
         try {
+            
+            // WIFI CONNECTION HERE
             // Check if wifi boolean is connected.
             if (Properties.getInstance().wifiStatus) {
 
@@ -172,6 +179,7 @@ public class ConnectionThread extends Thread {
 
             } else {
 
+                // BLUETOOTH CONNECTION HERE
                 // Bluetooth connect() method
                 connect();
 
