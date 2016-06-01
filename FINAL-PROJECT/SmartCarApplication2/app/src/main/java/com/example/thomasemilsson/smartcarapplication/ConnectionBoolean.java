@@ -5,7 +5,8 @@ package com.example.thomasemilsson.smartcarapplication;
  */
 
 /**
- * Class that returns an instance to determine wether wifi is connected (?)
+ * Class that returns an instance to determine whether wifi is connected.
+ * Used to check whether Wifi or bluetooth connection is being made
  */
 
 public class ConnectionBoolean {
