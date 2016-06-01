@@ -6,7 +6,8 @@ package com.example.thomasemilsson.smartcarapplication;
 
 
 /** 
- * Add description on the purpose and how to use this class
+ * Holds an instance of a ConnectionHandler class, to be able to maintain the connection
+ * and check the status of the current connection as new Activities are opened.
  */
 
 public class ConnectionSingleton {
