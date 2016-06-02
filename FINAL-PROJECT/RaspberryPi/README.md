@@ -44,3 +44,4 @@ Note: command shoul be above exit command.
 
 #Command
 
+java -Djava.library.path=/usr/lib/jni -cp .:/usr/share/java/RXTXcomm.jar WifiServer
