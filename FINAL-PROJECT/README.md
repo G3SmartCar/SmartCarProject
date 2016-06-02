@@ -4,7 +4,6 @@
 
 ![alt tag](https://github.com/G3SmartCar/SmartCarProject/blob/master/Extra/main%20feature.jpg)
 
-
 #The Application
 
 ![alt tag](https://github.com/G3SmartCar/SmartCarProject/blob/master/Extra/Components.jpg)
@@ -16,8 +15,6 @@
 #Creators:
 
 ![alt tag](https://github.com/G3SmartCar/SmartCarProject/blob/master/Extra/Group%20members.jpg)
-
-
 
 
 
