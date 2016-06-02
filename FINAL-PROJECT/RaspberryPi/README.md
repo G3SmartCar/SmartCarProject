@@ -31,3 +31,16 @@ network={
         psk="your password"
         key_mgmt=WPA-PSK
 }
+
+#Run Command On Boot
+
+Open local by typing:
+
+sudo nano /etc/rc.local
+
+
+Type commands you want to be run on boot. 
+Note: command shoul be above exit command.
+
+#Command
+
