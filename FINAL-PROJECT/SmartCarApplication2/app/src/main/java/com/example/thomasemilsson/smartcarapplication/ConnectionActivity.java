@@ -2,7 +2,6 @@ package com.example.thomasemilsson.smartcarapplication;
 
 /**
  * Created by thomasemilsson on 5/12/16.
- * TODO: Add description to class and all(I can help here) public methods
  * This class connects to to RaspberryPi, Arduino through bluetooth or wifi. 
  *
  */
