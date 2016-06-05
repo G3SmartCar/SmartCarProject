@@ -96,7 +96,6 @@ public class ConnectionThread extends Thread {
 
         BluetoothDevice myBluetooth = adapter.getRemoteDevice(address);
 
-        // NO IDEA WHY THIS WORKS
         Method m = myBluetooth.getClass().getMethod("createRfcommSocket", new Class[]{int.class});
         bluetoothSocket = (BluetoothSocket) m.invoke(myBluetooth, 1);
 
