@@ -18,7 +18,6 @@
 
 
 
-
 #Before & After
 
 ![alt tag](https://github.com/G3SmartCar/SmartCarProject/blob/master/Extra/before%20after.jpg)
