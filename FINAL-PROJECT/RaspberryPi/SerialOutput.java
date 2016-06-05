@@ -2,9 +2,7 @@
    Source: http://playground.arduino.cc/Interfacing/Java#.Uz1nj3WSxGg except sendSerial().
 */
 
-/*
- @author mattias
-*/
+
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
