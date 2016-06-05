@@ -1,5 +1,8 @@
 import java.io.*;
 import java.net.*;
+/*
+ @author mattias
+*/
 
 public class WifiClient {
     public static void main(String[] args) throws IOException {
