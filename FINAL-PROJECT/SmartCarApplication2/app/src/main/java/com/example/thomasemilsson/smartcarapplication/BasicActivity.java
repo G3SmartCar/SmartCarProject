@@ -1,5 +1,8 @@
 package com.example.thomasemilsson.smartcarapplication;
 
+/**
+ * @author thomasemilsson
+ */
 import android.content.Context;
 import android.content.Intent;
 
